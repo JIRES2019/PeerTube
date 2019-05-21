@@ -1,17 +1,78 @@
 # Changelog
 
+## v1.1.0-alpha.2 (since v1.1.0-alpha.1)
+
+### Security/Maintenance/Federation
+ 
+ * Add HTTP Signature in addition to Linked Signature:
+    * It's faster
+    * Will allow us to use RSA Signature 2018 in the future without too much incompatibilities in the peertube federation 
+ 
+### Features
+
+ * Set shorter keyframe interval for transcoding (2 seconds) ([@Nutomic](https://github.com/nutomic))
+ * Add ability to disable webtorrent (as a user) ([@rigelk](https://github.com/rigelk))
+ * Make abuse-delete clearer ([@barbeque](https://github.com/barbeque))
+ * Adding minimum signup age conforming to ceiling GPDR age ([@rigelk](https://github.com/rigelk))
+ * Feature/description support fields length 1000 ([@McFlat](https://github.com/mcflat))
+
+### Bug fixes
+
+ * Scale bitrate linearly with FPS ([@Nutomic](https://github.com/nutomic))
+ * AP mimeType -> mediaType
+ * PeerTube is not in beta anymore
+ * PeerTube is not in alpha anymore :p
+ * Fix optimize old videos script
+
+
 ## v1.0.1
 
-### SECURITY
+### Security/Maintenance/Federation
  
  * Add HTTP Signature in addition to Linked Signature:
     * It's faster
     * Will allow us to use RSA Signature 2018 in the future without too much incompatibilities in the peertube federation
 
 
+## v1.1.0-alpha.1
+
+We released this alpha version because some admins/users need some moderation tools we implemented in recent weeks.
+This release could contain bugs. Don't expect a stable v1.1.0 until December :)
+
+### Scripts
+
+ * Use DB information from config/production.yaml in upgrade script ([@ldidry](https://github.com/ldidry))
+ * Add REPL script ([@McFlat](https://github.com/mcflat))
+
+### Docker
+
+ * Add search and import settings env settings env variables ([@kaiyou](https://github.com/kaiyou))
+ * Add docker dev image ([@am97](https://github.com/am97))
+
+### Features
+ 
+ * Automatically resume videos if the user is logged in
+ * Hide automatically the menu when the window is resized ([@BO41](https://github.com/BO41))
+ * Remove confirm modal for JavaScript/CSS injection ([@scanlime](https://github.com/scanlime))
+ * Set bitrate limits for transcoding ([@Nutomic](https://github.com/nutomic))
+ * Add moderation tools in the account page
+ * Add bulk actions in users table (Delete/Ban for now)
+ * Add search filter in admin users table
+ * Add search filter in admin following
+ * Add search filter in admin followers
+ * Add ability to list all local videos
+ * Add ability for users to mute an account or an instance
+ * Add ability for administrators to mute an account or an instance
+ * Rename "News" category to "News & Politics" ([@daker](https://github.com/daker))
+ * Add explicit error message when changing video ownership ([@lucas-dclrcq](https://github.com/lucas-dclrcq))
+ * Improve description of the HTTP video import feature ([@rigelk](https://github.com/rigelk))
+
+
 ## v1.0.0
 
-Announcement scheduled for october 15
+### SECURITY
+
+ * Add more headers to HTTP signature to avoid actor impersonation by replaying modified signed HTTP requests (thanks Thibaut Girka)
 
 ### Bug fixes
 

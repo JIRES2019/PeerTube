@@ -7,7 +7,9 @@ import { VideoSupportComponent } from '@app/videos/+video-watch/modal/video-supp
 import { MetaService } from '@ngx-meta/core'
 import { NotificationsService } from 'angular2-notifications'
 import { forkJoin, Subscription } from 'rxjs'
-import * as videojs from 'video.js'
+// FIXME: something weird with our path definition in tsconfig and typings
+// @ts-ignore
+import videojs from 'video.js'
 import 'videojs-hotkeys'
 import { Hotkey, HotkeysService } from 'angular2-hotkeys'
 import * as WebTorrent from 'webtorrent'
@@ -277,6 +279,11 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
 
     return this.video.tags
   }
+  getVideoAutors () {
+    if (!this.video || Array.isArray(this.video.autors) === false) return []
+
+    return this.video.autors
+  }
 
   isVideoRemovable () {
     return this.video.isRemovableBy(this.authService.getUser())
@@ -369,13 +376,17 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
         )
   }
 
-  private async onVideoFetched (video: VideoDetails, videoCaptions: VideoCaption[], startTime = 0) {
+  private async onVideoFetched (video: VideoDetails, videoCaptions: VideoCaption[], startTimeFromUrl: number) {
     this.video = video
 
     // Re init attributes
     this.descriptionLoading = false
     this.completeDescriptionShown = false
     this.remoteServerDown = false
+
+    let startTime = startTimeFromUrl || (this.video.userHistory ? this.video.userHistory.currentTime : 0)
+    // Don't start the video if we are at the end
+    if (this.video.duration - startTime <= 1) startTime = 0
 
     if (this.video.isVideoNSFWForUser(this.user, this.serverService.getConfig())) {
       const res = await this.confirmService.confirm(
@@ -414,7 +425,12 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
       poster: this.video.previewUrl,
       startTime,
       theaterMode: true,
-      language: this.localeId
+      language: this.localeId,
+
+      userWatching: this.user ? {
+        url: this.videoService.getUserWatchingVideoUrl(this.video.uuid),
+        authorizationHeader: this.authService.getRequestHeaderValue()
+      } : undefined
     })
 
     if (this.videojsLocaleLoaded === false) {
@@ -424,9 +440,9 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
 
     const self = this
     this.zone.runOutsideAngular(async () => {
-      videojs(this.playerElement, videojsOptions, function () {
+      videojs(this.playerElement, videojsOptions, function (this: videojs.Player) {
         self.player = this
-        this.on('customError', (event, data) => self.handleError(data.err))
+        this.on('customError', ({ err }: { err: any }) => self.handleError(err))
 
         addContextMenu(self.player, self.video.embedUrl)
       })
@@ -439,7 +455,7 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
     this.checkUserRating()
   }
 
-  private setRating (nextRating) {
+  private setRating (nextRating: VideoRateType) {
     let method
     switch (nextRating) {
       case 'like':
@@ -461,7 +477,7 @@ export class VideoWatchComponent implements OnInit, OnDestroy {
               this.userRating = nextRating
             },
 
-            err => this.notificationsService.error(this.i18n('Error'), err.message)
+            (err: { message: string }) => this.notificationsService.error(this.i18n('Error'), err.message)
           )
   }
 

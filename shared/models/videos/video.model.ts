@@ -57,6 +57,7 @@ export interface Video {
   views: number
   likes: number
   dislikes: number
+  articleid: number
   nsfw: boolean
 
   waitTranscoding?: boolean
@@ -68,6 +69,10 @@ export interface Video {
 
   account: AccountAttribute
   channel: VideoChannelAttribute
+
+  userHistory?: {
+    currentTime: number
+  }
 }
 
 export interface VideoDetails extends Video {
@@ -75,6 +80,7 @@ export interface VideoDetails extends Video {
   support: string
   channel: VideoChannel
   tags: string[]
+  autors: string[]
   files: VideoFile[]
   account: Account
   commentsEnabled: boolean

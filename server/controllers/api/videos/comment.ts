@@ -8,19 +8,19 @@ import { buildFormattedCommentTree, createVideoComment } from '../../../lib/vide
 import {
   asyncMiddleware,
   asyncRetryTransactionMiddleware,
-  authenticate,
+  authenticate, optionalAuthenticate,
   paginationValidator,
   setDefaultPagination,
   setDefaultSort
 } from '../../../middlewares'
-import { videoCommentThreadsSortValidator } from '../../../middlewares/validators'
 import {
   addVideoCommentReplyValidator,
   addVideoCommentThreadValidator,
   listVideoCommentThreadsValidator,
   listVideoThreadCommentsValidator,
-  removeVideoCommentValidator
-} from '../../../middlewares/validators/video-comments'
+  removeVideoCommentValidator,
+  videoCommentThreadsSortValidator
+} from '../../../middlewares/validators'
 import { VideoModel } from '../../../models/video/video'
 import { VideoCommentModel } from '../../../models/video/video-comment'
 import { auditLoggerFactory, CommentAuditView, getAuditIdFromRes } from '../../../helpers/audit-logger'
@@ -36,10 +36,12 @@ videoCommentRouter.get('/:videoId/comment-threads',
   setDefaultSort,
   setDefaultPagination,
   asyncMiddleware(listVideoCommentThreadsValidator),
+  optionalAuthenticate,
   asyncMiddleware(listVideoThreads)
 )
 videoCommentRouter.get('/:videoId/comment-threads/:threadId',
   asyncMiddleware(listVideoThreadCommentsValidator),
+  optionalAuthenticate,
   asyncMiddleware(listVideoThreadComments)
 )
 
@@ -69,10 +71,12 @@ export {
 
 async function listVideoThreads (req: express.Request, res: express.Response, next: express.NextFunction) {
   const video = res.locals.video as VideoModel
+  const user: UserModel = res.locals.oauth ? res.locals.oauth.token.User : undefined
+
   let resultList: ResultList<VideoCommentModel>
 
   if (video.commentsEnabled === true) {
-    resultList = await VideoCommentModel.listThreadsForApi(video.id, req.query.start, req.query.count, req.query.sort)
+    resultList = await VideoCommentModel.listThreadsForApi(video.id, req.query.start, req.query.count, req.query.sort, user)
   } else {
     resultList = {
       total: 0,
@@ -85,10 +89,12 @@ async function listVideoThreads (req: express.Request, res: express.Response, ne
 
 async function listVideoThreadComments (req: express.Request, res: express.Response, next: express.NextFunction) {
   const video = res.locals.video as VideoModel
+  const user: UserModel = res.locals.oauth ? res.locals.oauth.token.User : undefined
+
   let resultList: ResultList<VideoCommentModel>
 
   if (video.commentsEnabled === true) {
-    resultList = await VideoCommentModel.listThreadCommentsForApi(video.id, res.locals.videoCommentThread.id)
+    resultList = await VideoCommentModel.listThreadCommentsForApi(video.id, res.locals.videoCommentThread.id, user)
   } else {
     resultList = {
       total: 0,

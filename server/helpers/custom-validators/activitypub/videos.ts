@@ -5,8 +5,10 @@ import { exists, isBooleanValid, isDateValid, isUUIDValid } from '../misc'
 import {
   isVideoDurationValid,
   isVideoNameValid,
+  isVideoArticleidValid,
   isVideoStateValid,
   isVideoTagValid,
+  isVideoAutorValid,
   isVideoTruncatedDescriptionValid,
   isVideoViewsValid
 } from '../videos'
@@ -48,6 +50,7 @@ function sanitizeAndCheckVideoTorrentObject (video: any) {
   if (!video || video.type !== 'Video') return false
 
   if (!setValidRemoteTags(video)) return false
+  if (!setValidRemoteAutors(video)) return false
   if (!setValidRemoteVideoUrls(video)) return false
   if (!setRemoteVideoTruncatedContent(video)) return false
   if (!setValidAttributedTo(video)) return false
@@ -59,6 +62,7 @@ function sanitizeAndCheckVideoTorrentObject (video: any) {
 
   return isActivityPubUrlValid(video.id) &&
     isVideoNameValid(video.name) &&
+    isVideoArticleidValid(video.articleid) &&
     isActivityPubVideoDurationValid(video.duration) &&
     isUUIDValid(video.uuid) &&
     (!video.category || isRemoteNumberIdentifierValid(video.category)) &&
@@ -81,19 +85,20 @@ function isRemoteVideoUrlValid (url: any) {
 
   return url.type === 'Link' &&
     (
-      ACTIVITY_PUB.URL_MIME_TYPES.VIDEO.indexOf(url.mimeType) !== -1 &&
+      // TODO: remove mimeType (backward compatibility, introduced in v1.1.0)
+      ACTIVITY_PUB.URL_MIME_TYPES.VIDEO.indexOf(url.mediaType || url.mimeType) !== -1 &&
       isActivityPubUrlValid(url.href) &&
       validator.isInt(url.height + '', { min: 0 }) &&
       validator.isInt(url.size + '', { min: 0 }) &&
       (!url.fps || validator.isInt(url.fps + '', { min: -1 }))
     ) ||
     (
-      ACTIVITY_PUB.URL_MIME_TYPES.TORRENT.indexOf(url.mimeType) !== -1 &&
+      ACTIVITY_PUB.URL_MIME_TYPES.TORRENT.indexOf(url.mediaType || url.mimeType) !== -1 &&
       isActivityPubUrlValid(url.href) &&
       validator.isInt(url.height + '', { min: 0 })
     ) ||
     (
-      ACTIVITY_PUB.URL_MIME_TYPES.MAGNET.indexOf(url.mimeType) !== -1 &&
+      ACTIVITY_PUB.URL_MIME_TYPES.MAGNET.indexOf(url.mediaType || url.mimeType) !== -1 &&
       validator.isLength(url.href, { min: 5 }) &&
       validator.isInt(url.height + '', { min: 0 })
     )
@@ -119,6 +124,17 @@ function setValidRemoteTags (video: any) {
   video.tag = video.tag.filter(t => {
     return t.type === 'Hashtag' &&
       isVideoTagValid(t.name)
+  })
+
+  return true
+}
+
+function setValidRemoteAutors (video: any) {
+  if (Array.isArray(video.autor) === false) return false
+
+  video.autor = video.autor.filter(t => {
+    return t.type === 'Hashautor' &&
+      isVideoAutorValid(t.name)
   })
 
   return true

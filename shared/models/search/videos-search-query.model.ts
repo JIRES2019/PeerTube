@@ -1,4 +1,5 @@
 import { NSFWQuery } from './nsfw-query.model'
+import { VideoFilter } from '../videos'
 
 export interface VideosSearchQuery {
   search?: string
@@ -21,6 +22,11 @@ export interface VideosSearchQuery {
   tagsOneOf?: string[]
   tagsAllOf?: string[]
 
+  autorsOneOf?: string[]
+  autorsAllOf?: string[]
+
   durationMin?: number // seconds
   durationMax?: number // seconds
+
+  filter?: VideoFilter
 }

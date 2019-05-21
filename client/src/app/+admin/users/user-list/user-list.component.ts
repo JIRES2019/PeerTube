@@ -2,13 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core'
 import { NotificationsService } from 'angular2-notifications'
 import { SortMeta } from 'primeng/components/common/sortmeta'
 import { ConfirmService } from '../../../core'
-import { RestPagination, RestTable } from '../../../shared'
-import { UserService } from '../shared'
+import { RestPagination, RestTable, UserService } from '../../../shared'
 import { I18n } from '@ngx-translate/i18n-polyfill'
-import { DropdownAction } from '@app/shared/buttons/action-dropdown.component'
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap/modal/modal-ref'
-import { UserBanModalComponent } from '@app/+admin/users/user-list/user-ban-modal.component'
 import { User } from '../../../../../../shared'
+import { UserBanModalComponent } from '@app/shared/moderation'
+import { DropdownAction } from '@app/shared/buttons/action-dropdown.component'
 
 @Component({
   selector: 'my-user-list',
@@ -23,9 +21,9 @@ export class UserListComponent extends RestTable implements OnInit {
   rowsPerPage = 10
   sort: SortMeta = { field: 'createdAt', order: 1 }
   pagination: RestPagination = { count: this.rowsPerPage, start: 0 }
-  userActions: DropdownAction<User>[] = []
 
-  private openedModal: NgbModalRef
+  selectedUsers: User[] = []
+  bulkUserActions: DropdownAction<User[]>[] = []
 
   constructor (
     private notificationsService: NotificationsService,
@@ -34,84 +32,80 @@ export class UserListComponent extends RestTable implements OnInit {
     private i18n: I18n
   ) {
     super()
+  }
 
-    this.userActions = [
-      {
-        label: this.i18n('Edit'),
-        linkBuilder: this.getRouterUserEditLink
-      },
+  ngOnInit () {
+    this.initialize()
+
+    this.bulkUserActions = [
       {
         label: this.i18n('Delete'),
-        handler: user => this.removeUser(user)
+        handler: users => this.removeUsers(users)
       },
       {
         label: this.i18n('Ban'),
-        handler: user => this.openBanUserModal(user),
-        isDisplayed: user => !user.blocked
+        handler: users => this.openBanUserModal(users),
+        isDisplayed: users => users.every(u => u.blocked === false)
       },
       {
         label: this.i18n('Unban'),
-        handler: user => this.unbanUser(user),
-        isDisplayed: user => user.blocked
+        handler: users => this.unbanUsers(users),
+        isDisplayed: users => users.every(u => u.blocked === true)
       }
     ]
   }
 
-  ngOnInit () {
-    this.loadSort()
-  }
-
-  hideBanUserModal () {
-    this.openedModal.close()
-  }
-
-  openBanUserModal (user: User) {
-    if (user.username === 'root') {
-      this.notificationsService.error(this.i18n('Error'), this.i18n('You cannot ban root.'))
-      return
+  openBanUserModal (users: User[]) {
+    for (const user of users) {
+      if (user.username === 'root') {
+        this.notificationsService.error(this.i18n('Error'), this.i18n('You cannot ban root.'))
+        return
+      }
     }
 
-    this.userBanModal.openModal(user)
+    this.userBanModal.openModal(users)
   }
 
-  onUserBanned () {
+  onUsersBanned () {
     this.loadData()
   }
 
-  async unbanUser (user: User) {
-    const message = this.i18n('Do you really want to unban {{username}}?', { username: user.username })
+  async unbanUsers (users: User[]) {
+    const message = this.i18n('Do you really want to unban {{num}} users?', { num: users.length })
+
     const res = await this.confirmService.confirm(message, this.i18n('Unban'))
     if (res === false) return
 
-    this.userService.unbanUser(user)
-      .subscribe(
-        () => {
-          this.notificationsService.success(
-            this.i18n('Success'),
-            this.i18n('User {{username}} unbanned.', { username: user.username })
-          )
-          this.loadData()
-        },
+    this.userService.unbanUsers(users)
+        .subscribe(
+          () => {
+            const message = this.i18n('{{num}} users unbanned.', { num: users.length })
 
-        err => this.notificationsService.error(this.i18n('Error'), err.message)
-      )
+            this.notificationsService.success(this.i18n('Success'), message)
+            this.loadData()
+          },
+
+          err => this.notificationsService.error(this.i18n('Error'), err.message)
+        )
   }
 
-  async removeUser (user: User) {
-    if (user.username === 'root') {
-      this.notificationsService.error(this.i18n('Error'), this.i18n('You cannot delete root.'))
-      return
+  async removeUsers (users: User[]) {
+    for (const user of users) {
+      if (user.username === 'root') {
+        this.notificationsService.error(this.i18n('Error'), this.i18n('You cannot delete root.'))
+        return
+      }
     }
 
-    const message = this.i18n('If you remove this user, you will not be able to create another with the same username!')
+    const message = this.i18n('If you remove these users, you will not be able to create others with the same username!')
     const res = await this.confirmService.confirm(message, this.i18n('Delete'))
     if (res === false) return
 
-    this.userService.removeUser(user).subscribe(
+    this.userService.removeUser(users).subscribe(
       () => {
         this.notificationsService.success(
           this.i18n('Success'),
-          this.i18n('User {{username}} deleted.', { username: user.username })
+          this.i18n('{{num}} users deleted.', { num: users.length })
         )
         this.loadData()
       },
@@ -120,12 +114,14 @@ export class UserListComponent extends RestTable implements OnInit {
     )
   }
 
-  getRouterUserEditLink (user: User) {
-    return [ '/admin', 'users', 'update', user.id ]
+  isInSelectionMode () {
+    return this.selectedUsers.length !== 0
   }
 
   protected loadData () {
-    this.userService.getUsers(this.pagination, this.sort)
+    this.selectedUsers = []
+
+    this.userService.getUsers(this.pagination, this.sort, this.search)
                     .subscribe(
                       resultList => {
                         this.users = resultList.data

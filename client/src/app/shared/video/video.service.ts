@@ -58,6 +58,10 @@ export class VideoService implements VideosProvider {
     return VideoService.BASE_VIDEO_URL + uuid + '/views'
   }
 
+  getUserWatchingVideoUrl (uuid: string) {
+    return VideoService.BASE_VIDEO_URL + uuid + '/watching'
+  }
+
   getVideo (uuid: string): Observable<VideoDetails> {
     return this.serverService.localeObservable
                .pipe(
@@ -80,6 +84,7 @@ export class VideoService implements VideosProvider {
 
     const body: VideoUpdate = {
       name: video.name,
+      articleid: video.articleid,
       category,
       licence,
       language,
@@ -88,6 +93,7 @@ export class VideoService implements VideosProvider {
       channelId: video.channelId,
       privacy: video.privacy,
       tags: video.tags,
+      autors: video.autors,
       nsfw: video.nsfw,
       waitTranscoding: video.waitTranscoding,
       commentsEnabled: video.commentsEnabled,
@@ -270,9 +276,9 @@ export class VideoService implements VideosProvider {
 
   loadCompleteDescription (descriptionPath: string) {
     return this.authHttp
-               .get(environment.apiUrl + descriptionPath)
+               .get<{ description: string }>(environment.apiUrl + descriptionPath)
                .pipe(
-                 map(res => res[ 'description' ]),
+                 map(res => res.description),
                  catchError(err => this.restExtractor.handleError(err))
                )
   }

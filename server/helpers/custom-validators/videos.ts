@@ -3,7 +3,7 @@ import 'express-validator'
 import { values } from 'lodash'
 import 'multer'
 import * as validator from 'validator'
-import { UserRight, VideoPrivacy, VideoRateType } from '../../../shared'
+import { UserRight, VideoFilter, VideoPrivacy, VideoRateType } from '../../../shared'
 import {
   CONSTRAINTS_FIELDS,
   VIDEO_CATEGORIES,
@@ -21,6 +21,10 @@ import * as magnetUtil from 'magnet-uri'
 import { fetchVideo, VideoFetchType } from '../video'
 
 const VIDEOS_CONSTRAINTS_FIELDS = CONSTRAINTS_FIELDS.VIDEOS
+
+function isVideoFilterValid (filter: VideoFilter) {
+  return filter === 'local' || filter === 'all-local'
+}
 
 function isVideoCategoryValid (value: any) {
   return value === null || VIDEO_CATEGORIES[ value ] !== undefined
@@ -58,11 +62,15 @@ function isVideoSupportValid (value: string) {
 function isVideoNameValid (value: string) {
   return exists(value) && validator.isLength(value, VIDEOS_CONSTRAINTS_FIELDS.NAME)
 }
-
+function isVideoArticleidValid (value: string) {
+   return exists(value) && validator.isLength(value, VIDEOS_CONSTRAINTS_FIELDS.ARTICLEID)
+}
 function isVideoTagValid (tag: string) {
   return exists(tag) && validator.isLength(tag, VIDEOS_CONSTRAINTS_FIELDS.TAG)
 }
-
+function isVideoAutorValid (autor: string) {
+  return exists(autor) && validator.isLength(autor, VIDEOS_CONSTRAINTS_FIELDS.AUTOR)
+}
 function isVideoTagsValid (tags: string[]) {
   return tags === null || (
     isArray(tags) &&
@@ -70,7 +78,13 @@ function isVideoTagsValid (tags: string[]) {
     tags.every(tag => isVideoTagValid(tag))
   )
 }
-
+function isVideoAutorsValid (autors: string[]) {
+  return autors === null || (
+    isArray(autors) &&
+    validator.isInt(autors.length.toString(), VIDEOS_CONSTRAINTS_FIELDS.AUTORS) &&
+    autors.every(autor => isVideoAutorValid(autor))
+  )
+}
 function isVideoViewsValid (value: string) {
   return exists(value) && validator.isInt(value + '', VIDEOS_CONSTRAINTS_FIELDS.VIEWS)
 }
@@ -154,7 +168,9 @@ function checkUserCanManageVideo (user: UserModel, video: VideoModel, right: Use
 }
 
 async function isVideoExist (id: string, res: Response, fetchType: VideoFetchType = 'all') {
-  const video = await fetchVideo(id, fetchType)
+  const userId = res.locals.oauth ? res.locals.oauth.token.User.id : undefined
+
+  const video = await fetchVideo(id, fetchType, userId)
 
   if (video === null) {
     res.status(404)
@@ -207,7 +223,9 @@ export {
   isVideoDescriptionValid,
   isVideoFileInfoHashValid,
   isVideoNameValid,
+  isVideoArticleidValid,
   isVideoTagsValid,
+  isVideoAutorsValid,
   isVideoFPSResolutionValid,
   isScheduleVideoUpdatePrivacyValid,
   isVideoFile,
@@ -217,11 +235,13 @@ export {
   isVideoRatingTypeValid,
   isVideoDurationValid,
   isVideoTagValid,
+  isVideoAutorValid,
   isVideoPrivacyValid,
   isVideoFileResolutionValid,
   isVideoFileSizeValid,
   isVideoExist,
   isVideoImage,
   isVideoChannelOfAccountExist,
-  isVideoSupportValid
+  isVideoSupportValid,
+  isVideoFilterValid
 }

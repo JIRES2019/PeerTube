@@ -38,6 +38,7 @@ export class Video implements VideoServerModel {
   views: number
   likes: number
   dislikes: number
+  articleid: number
   nsfw: boolean
 
   waitTranscoding?: boolean
@@ -66,6 +67,10 @@ export class Video implements VideoServerModel {
     avatar: Avatar
   }
 
+  userHistory?: {
+    currentTime: number
+  }
+
   static buildClientUrl (videoUUID: string) {
     return '/videos/watch/' + videoUUID
   }
@@ -88,6 +93,7 @@ export class Video implements VideoServerModel {
     this.uuid = hash.uuid
     this.isLocal = hash.isLocal
     this.name = hash.name
+    this.articleid = hash.articleid
     this.thumbnailPath = hash.thumbnailPath
     this.thumbnailUrl = absoluteAPIUrl + hash.thumbnailPath
     this.previewPath = hash.previewPath
@@ -116,6 +122,8 @@ export class Video implements VideoServerModel {
 
     this.blacklisted = hash.blacklisted
     this.blacklistedReason = hash.blacklistedReason
+
+    this.userHistory = hash.userHistory
   }
 
   isVideoNSFWForUser (user: User, serverConfig: ServerConfig) {

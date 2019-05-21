@@ -43,6 +43,7 @@ import {
   videosUpdateValidator
 } from '../../../middlewares'
 import { TagModel } from '../../../models/video/tag'
+import { AutorModel } from '../../../models/video/autor'
 import { VideoModel } from '../../../models/video/video'
 import { VideoFileModel } from '../../../models/video/video-file'
 import { abuseVideoRouter } from './abuse'
@@ -57,6 +58,7 @@ import { videoCaptionsRouter } from './captions'
 import { videoImportsRouter } from './import'
 import { resetSequelizeInstance } from '../../../helpers/database-utils'
 import { rename } from 'fs-extra'
+import { watchingRouter } from './watching'
 
 const auditLogger = auditLoggerFactory('videos')
 const videosRouter = express.Router()
@@ -86,6 +88,7 @@ videosRouter.use('/', videoCommentRouter)
 videosRouter.use('/', videoCaptionsRouter)
 videosRouter.use('/', videoImportsRouter)
 videosRouter.use('/', ownershipVideoRouter)
+videosRouter.use('/', watchingRouter)
 
 videosRouter.get('/categories', listVideoCategories)
 videosRouter.get('/licences', listVideoLicences)
@@ -119,6 +122,7 @@ videosRouter.get('/:id/description',
   asyncMiddleware(getVideoDescription)
 )
 videosRouter.get('/:id',
+  optionalAuthenticate,
   asyncMiddleware(videosGetValidator),
   getVideo
 )
@@ -171,6 +175,7 @@ async function addVideo (req: express.Request, res: express.Response) {
   // Prepare data so we don't block the transaction
   const videoData = {
     name: videoInfo.name,
+    articleid: videoInfo.articleid,
     remote: false,
     category: videoInfo.category,
     licence: videoInfo.licence,
@@ -248,7 +253,13 @@ async function addVideo (req: express.Request, res: express.Response) {
       await video.$set('Tags', tagInstances, sequelizeOptions)
       video.Tags = tagInstances
     }
+    // Create autors
+    if (videoInfo.autors !== undefined) {
+      const autorInstances = await AutorModel.findOrCreateAutors(videoInfo.autors, t)
 
+      await video.$set('Autors', autorInstances, sequelizeOptions)
+      video.Autors = autorInstances
+    }
     // Schedule an update in the future?
     if (videoInfo.scheduleUpdate) {
       await ScheduleVideoUpdateModel.create({
@@ -311,6 +322,7 @@ async function updateVideo (req: express.Request, res: express.Response) {
       const oldVideoChannel = videoInstance.VideoChannel
 
       if (videoInfoToUpdate.name !== undefined) videoInstance.set('name', videoInfoToUpdate.name)
+      if (videoInfoToUpdate.articleid !== undefined) videoInstance.set('articleid', videoInfoToUpdate.articleid)
       if (videoInfoToUpdate.category !== undefined) videoInstance.set('category', videoInfoToUpdate.category)
       if (videoInfoToUpdate.licence !== undefined) videoInstance.set('licence', videoInfoToUpdate.licence)
       if (videoInfoToUpdate.language !== undefined) videoInstance.set('language', videoInfoToUpdate.language)
@@ -337,7 +349,13 @@ async function updateVideo (req: express.Request, res: express.Response) {
         await videoInstanceUpdated.$set('Tags', tagInstances, sequelizeOptions)
         videoInstanceUpdated.Tags = tagInstances
       }
+      // Video autors update?
+      if (videoInfoToUpdate.autors !== undefined) {
+        const autorInstances = await AutorModel.findOrCreateAutors(videoInfoToUpdate.autors, t)
 
+        await videoInstanceUpdated.$set('Autors', autorInstances, sequelizeOptions)
+        videoInstanceUpdated.Autors = autorInstances
+      }
       // Video channel update?
       if (res.locals.videoChannel && videoInstanceUpdated.channelId !== res.locals.videoChannel.id) {
         await videoInstanceUpdated.$set('VideoChannel', res.locals.videoChannel, { transaction: t })
@@ -431,9 +449,12 @@ async function listVideos (req: express.Request, res: express.Response, next: ex
     languageOneOf: req.query.languageOneOf,
     tagsOneOf: req.query.tagsOneOf,
     tagsAllOf: req.query.tagsAllOf,
+    autorsOneOf: req.query.autorsOneOf,
+    autorsAllOf: req.query.autorsAllOf,
     nsfw: buildNSFWFilter(res, req.query.nsfw),
     filter: req.query.filter as VideoFilter,
-    withFiles: false
+    withFiles: false,
+    user: res.locals.oauth ? res.locals.oauth.token.User : undefined
   })
 
   return res.json(getFormattedObjects(resultList.data, resultList.total))

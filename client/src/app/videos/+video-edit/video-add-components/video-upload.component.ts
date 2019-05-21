@@ -1,5 +1,5 @@
 import { HttpEventType, HttpResponse } from '@angular/common/http'
-import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core'
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core'
 import { Router } from '@angular/router'
 import { LoadingBarService } from '@ngx-loading-bar/core'
 import { NotificationsService } from 'angular2-notifications'
@@ -25,7 +25,7 @@ import { VideoCaptionService } from '@app/shared/video-caption'
 })
 export class VideoUploadComponent extends VideoSend implements OnInit, OnDestroy, CanComponentDeactivate {
   @Output() firstStepDone = new EventEmitter<string>()
-  @ViewChild('videofileInput') videofileInput
+  @ViewChild('videofileInput') videofileInput: ElementRef<HTMLInputElement>
 
   // So that it can be accessed in the template
   readonly SPECIAL_SCHEDULED_PRIVACY = VideoEdit.SPECIAL_SCHEDULED_PRIVACY
@@ -43,7 +43,7 @@ export class VideoUploadComponent extends VideoSend implements OnInit, OnDestroy
     uuid: ''
   }
 
-  protected readonly DEFAULT_VIDEO_PRIVACY = VideoPrivacy.PUBLIC
+  protected readonly DEFAULT_VIDEO_PRIVACY = VideoPrivacy.PRIVATE
 
   constructor (
     protected formValidatorService: FormValidatorService,
@@ -110,7 +110,7 @@ export class VideoUploadComponent extends VideoSend implements OnInit, OnDestroy
   }
 
   uploadFirstStep () {
-    const videofile = this.videofileInput.nativeElement.files[0] as File
+    const videofile = this.videofileInput.nativeElement.files[0]
     if (!videofile) return
 
     // Cannot upload videos > 8GB for now
@@ -160,9 +160,11 @@ export class VideoUploadComponent extends VideoSend implements OnInit, OnDestroy
     const waitTranscoding = true
     const commentsEnabled = true
     const channelId = this.firstStepChannelId.toString()
+    const articleid = '1'
 
     const formData = new FormData()
     formData.append('name', name)
+    formData.append('articleid', articleid)
     // Put the video "private" -> we are waiting the user validation of the second step
     formData.append('privacy', VideoPrivacy.PRIVATE.toString())
     formData.append('nsfw', '' + nsfw)

@@ -1,12 +1,12 @@
 # /!\ YOU SHOULD NOT UPDATE THIS FILE, USE production.yaml instead /!\ #
 
 listen:
-  hostname: '127.0.0.1'
+  hostname: 'peertube-preprod.dmz.u-bourgogne.fr'
   port: 9000
 
 webserver:
   https: false
-  hostname: 'localhost'
+  hostname: 'peertube-preprod.dmz.u-bourgogne.fr'
   port: 9000
 
 # Proxies to trust to get real client IP
@@ -55,7 +55,7 @@ storage:
   cache: 'storage/cache/'
 
 log:
-  level: 'info' # debug/info/warning/error
+  level: 'error' # debug/info/warning/error
 
 search:
   remote_uri: # Add ability to fetch remote videos/actors by their URI, that may not be federated with your instance

@@ -161,7 +161,7 @@
           </div>
 
           <div class="video-attribute">
-            <span i18n class="video-attribute-label">Category</span>
+            <span i18n class="video-attribute-label">Thèmes</span>
             <span *ngIf="!video.category.id" class="video-attribute-value">{{ video.category.label }}</span>
             <a
               *ngIf="video.category.id" class="video-attribute-value"
@@ -194,6 +194,17 @@
               class="video-attribute-value" [routerLink]="[ '/search' ]" [queryParams]="{ tagsOneOf: [ tag ] }"
             >{{ tag }}</a>
           </div>
+            <div class="video-attribute video-attribute-autors">
+            <span i18n class="video-attribute-label">Auteurs</span>
+            <a
+              *ngFor="let autor of getVideoAutors()"
+              class="video-attribute-value" [routerLink]="[ '/search' ]" [queryParams]="{ autorsOneOf: [ autor ] }"
+            >{{ autor }}</a>
+          </div>
+        <!-- <div class="video-attribute">
+            <span i18n class="video-attribute-label">Article</span>
+            <span class="video-attribute-value">{{ video.articleid }}</span>
+          </div>-->
         </div>
 
         <my-video-comments [video]="video" [user]="user"></my-video-comments>

@@ -10,6 +10,7 @@ import {
   getVideoLikesActivityPubUrl,
   getVideoSharesActivityPubUrl
 } from '../../lib/activitypub'
+import { isArray } from '../../helpers/custom-validators/misc'
 
 export type VideoFormattingJSONOptions = {
   completeDescription?: boolean
@@ -23,6 +24,8 @@ export type VideoFormattingJSONOptions = {
 function videoModelToFormattedJSON (video: VideoModel, options?: VideoFormattingJSONOptions): Video {
   const formattedAccount = video.VideoChannel.Account.toFormattedJSON()
   const formattedVideoChannel = video.VideoChannel.toFormattedJSON()
+
+  const userHistory = isArray(video.UserVideoHistories) ? video.UserVideoHistories[0] : undefined
 
   const videoObject: Video = {
     id: video.id,
@@ -51,6 +54,7 @@ function videoModelToFormattedJSON (video: VideoModel, options?: VideoFormatting
     views: video.views,
     likes: video.likes,
     dislikes: video.dislikes,
+    articleid: video.articleid,
     thumbnailPath: video.getThumbnailStaticPath(),
     previewPath: video.getPreviewStaticPath(),
     embedPath: video.getEmbedStaticPath(),
@@ -74,7 +78,11 @@ function videoModelToFormattedJSON (video: VideoModel, options?: VideoFormatting
       url: formattedVideoChannel.url,
       host: formattedVideoChannel.host,
       avatar: formattedVideoChannel.avatar
-    }
+    },
+
+    userHistory: userHistory ? {
+      currentTime: userHistory.currentTime
+    } : undefined
   }
 
   if (options) {
@@ -114,12 +122,14 @@ function videoModelToFormattedDetailsJSON (video: VideoModel): VideoDetails {
   })
 
   const tags = video.Tags ? video.Tags.map(t => t.name) : []
+  const autors = video.Autors ? video.Autors.map(a => a.name) : []
   const detailsJson = {
     support: video.support,
     descriptionPath: video.getDescriptionAPIPath(),
     channel: video.VideoChannel.toFormattedJSON(),
     account: video.VideoChannel.Account.toFormattedJSON(),
     tags,
+    autors,
     commentsEnabled: video.commentsEnabled,
     waitTranscoding: video.waitTranscoding,
     state: {
@@ -171,7 +181,12 @@ function videoModelToActivityPubObject (video: VideoModel): VideoTorrentObject {
     type: 'Hashtag' as 'Hashtag',
     name: t.name
   }))
+  if (!video.Autors) video.Autors = []
 
+  const autor = video.Autors.map(a => ({
+    type: 'Hashautor' as 'Hashautor',
+    name: a.name
+  }))
   let language
   if (video.language) {
     language = {
@@ -201,6 +216,7 @@ function videoModelToActivityPubObject (video: VideoModel): VideoTorrentObject {
     url.push({
       type: 'Link',
       mimeType: VIDEO_EXT_MIMETYPE[ file.extname ] as any,
+      mediaType: VIDEO_EXT_MIMETYPE[ file.extname ] as any,
       href: video.getVideoFileUrl(file, baseUrlHttp),
       height: file.resolution,
       size: file.size,
@@ -210,6 +226,7 @@ function videoModelToActivityPubObject (video: VideoModel): VideoTorrentObject {
     url.push({
       type: 'Link',
       mimeType: 'application/x-bittorrent' as 'application/x-bittorrent',
+      mediaType: 'application/x-bittorrent' as 'application/x-bittorrent',
       href: video.getTorrentUrl(file, baseUrlHttp),
       height: file.resolution
     })
@@ -217,6 +234,7 @@ function videoModelToActivityPubObject (video: VideoModel): VideoTorrentObject {
     url.push({
       type: 'Link',
       mimeType: 'application/x-bittorrent;x-scheme-handler/magnet' as 'application/x-bittorrent;x-scheme-handler/magnet',
+      mediaType: 'application/x-bittorrent;x-scheme-handler/magnet' as 'application/x-bittorrent;x-scheme-handler/magnet',
       href: video.generateMagnetUri(file, baseUrlHttp, baseUrlWs),
       height: file.resolution
     })
@@ -226,6 +244,7 @@ function videoModelToActivityPubObject (video: VideoModel): VideoTorrentObject {
   url.push({
     type: 'Link',
     mimeType: 'text/html',
+    mediaType: 'text/html',
     href: CONFIG.WEBSERVER.URL + '/videos/watch/' + video.uuid
   })
 
@@ -244,6 +263,7 @@ function videoModelToActivityPubObject (video: VideoModel): VideoTorrentObject {
     duration: getActivityStreamDuration(video.duration),
     uuid: video.uuid,
     tag,
+    autor,
     category,
     licence,
     language,
@@ -268,6 +288,7 @@ function videoModelToActivityPubObject (video: VideoModel): VideoTorrentObject {
     url,
     likes: getVideoLikesActivityPubUrl(video),
     dislikes: getVideoDislikesActivityPubUrl(video),
+    articleid: video.articleid,
     shares: getVideoSharesActivityPubUrl(video),
     comments: getVideoCommentsActivityPubUrl(video),
     attributedTo: [

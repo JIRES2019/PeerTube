@@ -11,7 +11,9 @@ export class VideoEdit implements VideoUpdate {
   language: string
   description: string
   name: string
+  articleid: number
   tags: string[]
+  autors: string[]
   nsfw: boolean
   commentsEnabled: boolean
   waitTranscoding: boolean
@@ -26,7 +28,7 @@ export class VideoEdit implements VideoUpdate {
   id?: number
   scheduleUpdate?: VideoScheduleUpdate
 
-  constructor (video?: Video & { tags: string[], commentsEnabled: boolean, support: string, thumbnailUrl: string, previewUrl: string }) {
+  constructor (video?: Video & { tags: string[], autors: string[], commentsEnabled: boolean, support: string, thumbnailUrl: string, previewUrl: string }) {
     if (video) {
       this.id = video.id
       this.uuid = video.uuid
@@ -35,7 +37,9 @@ export class VideoEdit implements VideoUpdate {
       this.language = video.language.id
       this.description = video.description
       this.name = video.name
+      this.articleid = video.articleid
       this.tags = video.tags
+      this.autors = video.autors
       this.nsfw = video.nsfw
       this.commentsEnabled = video.commentsEnabled
       this.waitTranscoding = video.waitTranscoding
@@ -49,14 +53,14 @@ export class VideoEdit implements VideoUpdate {
     }
   }
 
-  patch (values: Object) {
+  patch (values: { [ id: string ]: string }) {
     Object.keys(values).forEach((key) => {
       this[ key ] = values[ key ]
     })
 
     // If schedule publication, the video is private and will be changed to public privacy
     if (parseInt(values['privacy'], 10) === VideoEdit.SPECIAL_SCHEDULED_PRIVACY) {
-      const updateAt = (values['schedulePublicationAt'] as Date)
+      const updateAt = new Date(values['schedulePublicationAt'])
       updateAt.setSeconds(0)
 
       this.privacy = VideoPrivacy.PRIVATE
@@ -77,7 +81,9 @@ export class VideoEdit implements VideoUpdate {
       description: this.description,
       support: this.support,
       name: this.name,
+      articleid: this.articleid,
       tags: this.tags,
+      autors: this.autors,
       nsfw: this.nsfw,
       commentsEnabled: this.commentsEnabled,
       waitTranscoding: this.waitTranscoding,

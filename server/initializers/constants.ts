@@ -3,9 +3,9 @@ import { dirname, join } from 'path'
 import { JobType, VideoRateType, VideoState, VideosRedundancy } from '../../shared/models'
 import { ActivityPubActorType } from '../../shared/models/activitypub'
 import { FollowState } from '../../shared/models/actors'
-import { VideoAbuseState, VideoImportState, VideoPrivacy } from '../../shared/models/videos'
+import { VideoAbuseState, VideoImportState, VideoPrivacy, VideoTranscodingFPS } from '../../shared/models/videos'
 // Do not use barrels, remain constants as independent as possible
-import { buildPath, isTestInstance, parseDuration, root, sanitizeHost, sanitizeUrl } from '../helpers/core-utils'
+import { buildPath, isTestInstance, parseDuration, parseBytes, root, sanitizeHost, sanitizeUrl } from '../helpers/core-utils'
 import { NSFWPolicyType } from '../../shared/models/videos/nsfw-policy.type'
 import { invert } from 'lodash'
 import { CronRepeatOptions, EveryRepeatOptions } from 'bull'
@@ -16,7 +16,7 @@ let config: IConfig = require('config')
 
 // ---------------------------------------------------------------------------
 
-const LAST_MIGRATION_VERSION = 275
+const LAST_MIGRATION_VERSION = 285
 
 // ---------------------------------------------------------------------------
 
@@ -47,7 +47,10 @@ const SORTABLE_COLUMNS = {
   VIDEOS: [ 'name', 'duration', 'createdAt', 'publishedAt', 'views', 'likes', 'trending' ],
 
   VIDEOS_SEARCH: [ 'name', 'duration', 'createdAt', 'publishedAt', 'views', 'likes', 'match' ],
-  VIDEO_CHANNELS_SEARCH: [ 'match', 'displayName', 'createdAt' ]
+  VIDEO_CHANNELS_SEARCH: [ 'match', 'displayName', 'createdAt' ],
+
+  ACCOUNTS_BLOCKLIST: [ 'createdAt' ],
+  SERVERS_BLOCKLIST: [ 'createdAt' ]
 }
 
 const OAUTH_LIFETIME = {
@@ -232,8 +235,8 @@ const CONFIG = {
     }
   },
   USER: {
-    get VIDEO_QUOTA () { return config.get<number>('user.video_quota') },
-    get VIDEO_QUOTA_DAILY () { return config.get<number>('user.video_quota_daily') }
+    get VIDEO_QUOTA () { return parseBytes(config.get<number>('user.video_quota')) },
+    get VIDEO_QUOTA_DAILY () { return parseBytes(config.get<number>('user.video_quota_daily')) }
   },
   TRANSCODING: {
     get ENABLED () { return config.get<boolean>('transcoding.enabled') },
@@ -292,7 +295,7 @@ const CONFIG = {
 const CONSTRAINTS_FIELDS = {
   USERS: {
     NAME: { min: 3, max: 120 }, // Length
-    DESCRIPTION: { min: 3, max: 250 }, // Length
+    DESCRIPTION: { min: 3, max: 1000 }, // Length
     USERNAME: { min: 3, max: 20 }, // Length
     PASSWORD: { min: 6, max: 255 }, // Length
     VIDEO_QUOTA: { min: -1 },
@@ -308,8 +311,8 @@ const CONSTRAINTS_FIELDS = {
   },
   VIDEO_CHANNELS: {
     NAME: { min: 3, max: 120 }, // Length
-    DESCRIPTION: { min: 3, max: 500 }, // Length
-    SUPPORT: { min: 3, max: 500 }, // Length
+    DESCRIPTION: { min: 3, max: 1000 }, // Length
+    SUPPORT: { min: 3, max: 1000 }, // Length
     URL: { min: 3, max: 2000 } // Length
   },
   VIDEO_CAPTIONS: {
@@ -335,10 +338,11 @@ const CONSTRAINTS_FIELDS = {
   },
   VIDEOS: {
     NAME: { min: 3, max: 120 }, // Length
+    ARTICLEID: { min: 0, max: 4 }, // Length
     LANGUAGE: { min: 1, max: 10 }, // Length
     TRUNCATED_DESCRIPTION: { min: 3, max: 250 }, // Length
     DESCRIPTION: { min: 3, max: 10000 }, // Length
-    SUPPORT: { min: 3, max: 500 }, // Length
+    SUPPORT: { min: 3, max: 1000 }, // Length
     IMAGE: {
       EXTNAME: [ '.jpg', '.jpeg' ],
       FILE_SIZE: {
@@ -348,8 +352,11 @@ const CONSTRAINTS_FIELDS = {
     EXTNAME: [ '.mp4', '.ogv', '.webm' ],
     INFO_HASH: { min: 40, max: 40 }, // Length, info hash is 20 bytes length but we represent it in hexadecimal so 20 * 2
     DURATION: { min: 0 }, // Number
-    TAGS: { min: 0, max: 5 }, // Number of total tags
+    TAGS: { min: 0, max: 15 }, // Number of total tags
     TAG: { min: 2, max: 30 }, // Length
+    S: { min: 0, max: 5 }, // Number of total autors
+    AUTORS: { min: 0, max: 15 }, // Length
+    AUTOR: { min: 2, max: 30 }, // Length
     THUMBNAIL: { min: 2, max: 30 },
     THUMBNAIL_DATA: { min: 0, max: 20000 }, // Bytes
     VIEWS: { min: 0 },
@@ -393,7 +400,7 @@ const RATES_LIMIT = {
 }
 
 let VIDEO_VIEW_LIFETIME = 60000 * 60 // 1 hour
-const VIDEO_TRANSCODING_FPS = {
+const VIDEO_TRANSCODING_FPS: VideoTranscodingFPS = {
   MIN: 10,
   AVERAGE: 30,
   MAX: 60,
@@ -411,24 +418,25 @@ const FFMPEG_NICE: { [ id: string ]: number } = {
 }
 
 const VIDEO_CATEGORIES = {
-  1: 'Music',
-  2: 'Films',
-  3: 'Vehicles',
-  4: 'Art',
-  5: 'Sports',
-  6: 'Travels',
-  7: 'Gaming',
-  8: 'People',
-  9: 'Comedy',
-  10: 'Entertainment',
-  11: 'News',
-  12: 'How To',
-  13: 'Education',
-  14: 'Activism',
-  15: 'Science & Technology',
-  16: 'Animals',
-  17: 'Kids',
-  18: 'Food'
+  1: 'Stockage, sauvegarde et archivage',
+  2: 'Services et applications',
+  3: 'Sécurité',
+  4: 'Réseau et infrastructures',
+  5: 'Virtualisation, système et hébergement',
+  6: 'Stratégie, organisation et collaboration',
+  7: 'Maitrise et administration du SI',
+  8: 'Identité numérique',
+  9: 'Messagerie et outils collaboratifs',
+  10: 'Usages et Pédagogie',
+  11: 'Gestion des logs',
+  12: 'Bonnes pratiques',
+  13: 'Confiance numérique',
+  14: 'Serveurs et Cloud',
+  15: 'Gestion de parc',
+  16: 'Plateformes scientifiques',
+  17: 'Prospective',
+  18: 'Réseau',
+  19: 'Divers'
 }
 
 // See https://creativecommons.org/licenses/?lang=en
@@ -494,7 +502,7 @@ const TORRENT_MIMETYPE_EXT = {
 
 const OVERVIEWS = {
   VIDEOS: {
-    SAMPLE_THRESHOLD: 6,
+    SAMPLE_THRESHOLD: 4,
     SAMPLES_COUNT: 2
   }
 }
@@ -622,7 +630,12 @@ const CUSTOM_HTML_TAG_COMMENTS = {
   CUSTOM_CSS: '<!-- custom css tag -->',
   OPENGRAPH_AND_OEMBED: '<!-- open graph and oembed tags -->'
 }
-
+const CUSTOM_HTML_AUTOR_COMMENTS = {
+  TITLE: '<!-- title autor -->',
+  DESCRIPTION: '<!-- description autor -->',
+  CUSTOM_CSS: '<!-- custom css autor -->',
+  OPENGRAPH_AND_OEMBED: '<!-- open graph and oembed autors -->'
+}
 // ---------------------------------------------------------------------------
 
 const FEEDS = {
@@ -691,6 +704,7 @@ export {
   LAST_MIGRATION_VERSION,
   OAUTH_LIFETIME,
   CUSTOM_HTML_TAG_COMMENTS,
+  CUSTOM_HTML_AUTOR_COMMENTS,
   BROADCAST_CONCURRENCY,
   PAGINATION,
   ACTOR_FOLLOW_SCORE,

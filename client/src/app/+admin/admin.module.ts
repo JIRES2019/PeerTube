@@ -10,12 +10,12 @@ import { FollowingListComponent } from './follows/following-list/following-list.
 import { JobsComponent } from './jobs/job.component'
 import { JobsListComponent } from './jobs/jobs-list/jobs-list.component'
 import { JobService } from './jobs/shared/job.service'
-import { UserCreateComponent, UserListComponent, UsersComponent, UserService, UserUpdateComponent } from './users'
+import { UserCreateComponent, UserListComponent, UsersComponent, UserUpdateComponent } from './users'
 import { ModerationCommentModalComponent, VideoAbuseListComponent, VideoBlacklistListComponent } from './moderation'
-import { UserBanModalComponent } from '@app/+admin/users/user-list/user-ban-modal.component'
 import { ModerationComponent } from '@app/+admin/moderation/moderation.component'
 import { RedundancyCheckboxComponent } from '@app/+admin/follows/shared/redundancy-checkbox.component'
 import { RedundancyService } from '@app/+admin/follows/shared/redundancy.service'
+import { InstanceAccountBlocklistComponent, InstanceServerBlocklistComponent } from '@app/+admin/moderation/instance-blocklist'
 
 @NgModule({
   imports: [
@@ -37,12 +37,13 @@ import { RedundancyService } from '@app/+admin/follows/shared/redundancy.service
     UserCreateComponent,
     UserUpdateComponent,
     UserListComponent,
-    UserBanModalComponent,
 
     ModerationComponent,
     VideoBlacklistListComponent,
     VideoAbuseListComponent,
     ModerationCommentModalComponent,
+    InstanceServerBlocklistComponent,
+    InstanceAccountBlocklistComponent,
 
     JobsComponent,
     JobsListComponent,
@@ -58,7 +59,6 @@ import { RedundancyService } from '@app/+admin/follows/shared/redundancy.service
   providers: [
     FollowService,
     RedundancyService,
-    UserService,
     JobService,
     ConfigService
   ]

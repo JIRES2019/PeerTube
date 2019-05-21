@@ -10,9 +10,13 @@ import './webtorrent-info-button'
 import './peertube-videojs-plugin'
 import './peertube-load-progress-bar'
 import './theater-button'
-import { VideoJSCaption, videojsUntyped } from './peertube-videojs-typings'
+import { UserWatching, VideoJSCaption, videojsUntyped } from './peertube-videojs-typings'
 import { buildVideoEmbed, buildVideoLink, copyToClipboard } from './utils'
 import { getCompleteLocale, getShortLocale, is18nLocale, isDefaultLocale } from '../../../../shared/models/i18n/i18n'
+
+// FIXME: something weird with our path definition in tsconfig and typings
+// @ts-ignore
+import { Player } from 'video.js'
 
 // Change 'Playback Rate' to 'Speed' (smaller for our settings menu)
 videojsUntyped.getComponent('PlaybackRateMenuButton').prototype.controlText_ = 'Speed'
@@ -34,10 +38,13 @@ function getVideojsOptions (options: {
   startTime: number | string
   theaterMode: boolean,
   videoCaptions: VideoJSCaption[],
+
   language?: string,
   controls?: boolean,
   muted?: boolean,
   loop?: boolean
+
+  userWatching?: UserWatching
 }) {
   const videojsOptions = {
     // We don't use text track settings for now
@@ -57,7 +64,8 @@ function getVideojsOptions (options: {
         playerElement: options.playerElement,
         videoViewUrl: options.videoViewUrl,
         videoDuration: options.videoDuration,
-        startTime: options.startTime
+        startTime: options.startTime,
+        userWatching: options.userWatching
       }
     },
     controlBar: {
@@ -71,12 +79,12 @@ function getVideojsOptions (options: {
         enableVolumeScroll: false,
         enableModifiersForNumbers: false,
 
-        fullscreenKey: function (event) {
+        fullscreenKey: function (event: KeyboardEvent) {
           // fullscreen with the f key or Ctrl+Enter
           return event.key === 'f' || (event.ctrlKey && event.key === 'Enter')
         },
 
-        seekStep: function (event) {
+        seekStep: function (event: KeyboardEvent) {
           // mimic VLC seek behavior, and default to 5 (original value is 5).
           if (event.ctrlKey && event.altKey) {
             return 5 * 60
@@ -91,26 +99,26 @@ function getVideojsOptions (options: {
 
         customKeys: {
           increasePlaybackRateKey: {
-            key: function (event) {
+            key: function (event: KeyboardEvent) {
               return event.key === '>'
             },
-            handler: function (player) {
+            handler: function (player: Player) {
               player.playbackRate((player.playbackRate() + 0.1).toFixed(2))
             }
           },
           decreasePlaybackRateKey: {
-            key: function (event) {
+            key: function (event: KeyboardEvent) {
               return event.key === '<'
             },
-            handler: function (player) {
+            handler: function (player: Player) {
               player.playbackRate((player.playbackRate() - 0.1).toFixed(2))
             }
           },
           frameByFrame: {
-            key: function (event) {
+            key: function (event: KeyboardEvent) {
               return event.key === '.'
             },
-            handler: function (player, options, event) {
+            handler: function (player: Player) {
               player.pause()
               // Calculate movement distance (assuming 30 fps)
               const dist = 1 / 30
@@ -205,7 +213,7 @@ function addContextMenu (player: any, videoEmbedUrl: string) {
       {
         label: player.localize('Copy the video URL at the current time'),
         listener: function () {
-          const player = this
+          const player = this as Player
           copyToClipboard(buildVideoLink(player.currentTime()))
         }
       },
@@ -218,7 +226,7 @@ function addContextMenu (player: any, videoEmbedUrl: string) {
       {
         label: player.localize('Copy magnet URI'),
         listener: function () {
-          const player = this
+          const player = this as Player
           copyToClipboard(player.peertube().getCurrentVideoFile().magnetUri)
         }
       }

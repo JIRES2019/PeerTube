@@ -6,6 +6,7 @@ import { BuildFormValidator } from '@app/shared'
 @Injectable()
 export class VideoValidatorsService {
   readonly VIDEO_NAME: BuildFormValidator
+  readonly VIDEO_ARTICLEID: BuildFormValidator
   readonly VIDEO_PRIVACY: BuildFormValidator
   readonly VIDEO_CATEGORY: BuildFormValidator
   readonly VIDEO_LICENCE: BuildFormValidator
@@ -14,6 +15,7 @@ export class VideoValidatorsService {
   readonly VIDEO_CHANNEL: BuildFormValidator
   readonly VIDEO_DESCRIPTION: BuildFormValidator
   readonly VIDEO_TAGS: BuildFormValidator
+  readonly VIDEO_AUTORS: BuildFormValidator
   readonly VIDEO_SUPPORT: BuildFormValidator
   readonly VIDEO_SCHEDULE_PUBLICATION_AT: BuildFormValidator
 
@@ -26,6 +28,11 @@ export class VideoValidatorsService {
         'minlength': this.i18n('Video name must be at least 3 characters long.'),
         'maxlength': this.i18n('Video name cannot be more than 120 characters long.')
       }
+    }
+    
+    this.VIDEO_ARTICLEID = {
+      VALIDATORS: [ ],
+      MESSAGES: {}
     }
 
     this.VIDEO_PRIVACY = {
@@ -77,12 +84,18 @@ export class VideoValidatorsService {
         'maxlength': this.i18n('A tag should be less than 30 characters long.')
       }
     }
-
+    this.VIDEO_AUTORS = {
+      VALIDATORS: [ Validators.minLength(3), Validators.maxLength(30) ],
+      MESSAGES: {
+        'minlength': this.i18n('An author should be more than 3 characters long.'),
+        'maxlength': this.i18n('An author should be less than 30 characters long.')
+      }
+    }
     this.VIDEO_SUPPORT = {
-      VALIDATORS: [ Validators.minLength(3), Validators.maxLength(500) ],
+      VALIDATORS: [ Validators.minLength(3), Validators.maxLength(1000) ],
       MESSAGES: {
         'minlength': this.i18n('Video support must be at least 3 characters long.'),
-        'maxlength': this.i18n('Video support cannot be more than 500 characters long.')
+        'maxlength': this.i18n('Video support cannot be more than 1000 characters long.')
       }
     }
 

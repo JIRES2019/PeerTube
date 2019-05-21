@@ -12,7 +12,10 @@
                 {{ formErrors.name }}
               </div>
             </div>
-
+            <div class="form-group">
+              <label i18n for="articleid">Article</label>
+              <input type="text" id="articleid" formControlName="articleid" />
+            </div>
             <div class="form-group">
               <label i18n class="label-tags">Tags</label>
               <my-help i18n-preHtml preHtml="Tags could be used to suggest relevant recommendations.</br>Press Enter to add a new tag."></my-help>
@@ -22,7 +25,15 @@
                 formControlName="tags" maxItems="5" modelAsStrings="true"
               ></tag-input>
             </div>
-
+            <div class="form-group">
+              <label i18n class="label-tags">Auteurs</label>
+              <!--<my-help i18n-preHtml preHtml="Tags could be used to suggest relevant recommendations.</br>Press Enter to add a new tag."></my-help>-->
+              <tag-input
+                [validators]="autorValidators" [errorMessages]="autorValidatorsMessages"
+                i18n-placeholder placeholder="+ Autor" i18n-secondaryPlaceholder secondaryPlaceholder="Enter a new autor"
+                formControlName="autors" maxItems="5" modelAsStrings="true"
+              ></tag-input>
+            </div>
             <div class="form-group">
               <label i18n for="description">Description</label>
               <my-help helpType="markdownText" i18n-preHtml preHtml="Video descriptions are truncated by default and require manual action to expand them."></my-help>
@@ -45,7 +56,7 @@
             </div>
 
             <div class="form-group">
-              <label i18n for="category">Category</label>
+              <label i18n for="category">Thèmes</label>
               <div class="peertube-select-container">
                 <select id="category" formControlName="category">
                   <option></option>

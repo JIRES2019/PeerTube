@@ -25,7 +25,7 @@ import { VideoAbuseService } from './video-abuse'
 import { VideoBlacklistService } from './video-blacklist'
 import { VideoOwnershipService } from './video-ownership'
 import { VideoMiniatureComponent } from './video/video-miniature.component'
-import { VideoFeedComponent } from './video/video-feed.component'
+import { FeedComponent } from './video/feed.component'
 import { VideoThumbnailComponent } from './video/video-thumbnail.component'
 import { VideoService } from './video/video.service'
 import { AccountService } from '@app/shared/account/account.service'
@@ -56,6 +56,9 @@ import { NgbDropdownModule, NgbModalModule, NgbPopoverModule, NgbTabsetModule, N
 import { SubscribeButtonComponent, RemoteSubscribeComponent, UserSubscriptionService } from '@app/shared/user-subscription'
 import { InstanceFeaturesTableComponent } from '@app/shared/instance/instance-features-table.component'
 import { OverviewService } from '@app/shared/overview'
+import { UserBanModalComponent } from '@app/shared/moderation'
+import { UserModerationDropdownComponent } from '@app/shared/moderation/user-moderation-dropdown.component'
+import { BlocklistService } from '@app/shared/blocklist'
 
 @NgModule({
   imports: [
@@ -79,7 +82,7 @@ import { OverviewService } from '@app/shared/overview'
     LoaderComponent,
     VideoThumbnailComponent,
     VideoMiniatureComponent,
-    VideoFeedComponent,
+    FeedComponent,
     ButtonComponent,
     DeleteButtonComponent,
     EditButtonComponent,
@@ -94,7 +97,9 @@ import { OverviewService } from '@app/shared/overview'
     PeertubeCheckboxComponent,
     SubscribeButtonComponent,
     RemoteSubscribeComponent,
-    InstanceFeaturesTableComponent
+    InstanceFeaturesTableComponent,
+    UserBanModalComponent,
+    UserModerationDropdownComponent
   ],
 
   exports: [
@@ -117,7 +122,7 @@ import { OverviewService } from '@app/shared/overview'
     LoaderComponent,
     VideoThumbnailComponent,
     VideoMiniatureComponent,
-    VideoFeedComponent,
+    FeedComponent,
     ButtonComponent,
     DeleteButtonComponent,
     EditButtonComponent,
@@ -130,6 +135,8 @@ import { OverviewService } from '@app/shared/overview'
     SubscribeButtonComponent,
     RemoteSubscribeComponent,
     InstanceFeaturesTableComponent,
+    UserBanModalComponent,
+    UserModerationDropdownComponent,
 
     NumberFormatterPipe,
     ObjectLengthPipe,
@@ -166,6 +173,7 @@ import { OverviewService } from '@app/shared/overview'
     OverviewService,
     VideoChangeOwnershipValidatorsService,
     VideoAcceptOwnershipValidatorsService,
+    BlocklistService,
 
     I18nPrimengCalendarService,
     ScreenService,

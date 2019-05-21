@@ -162,7 +162,7 @@ $other-videos-width: 260px;
         }
       }
 
-      my-video-feed {
+      my-feed {
         margin-left: 5px;
         margin-top: 1px;
       }
@@ -353,6 +353,13 @@ $other-videos-width: 260px;
       }
 
       &.video-attribute-tags {
+        .video-attribute-value:not(:nth-child(2)) {
+          &::before {
+            content: ', '
+          }
+        }
+      }
+      &.video-attribute-autors {
         .video-attribute-value:not(:nth-child(2)) {
           &::before {
             content: ', '
