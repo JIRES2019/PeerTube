@@ -169,6 +169,7 @@ async function addYoutubeDLImport (req: express.Request, res: express.Response) 
 function buildVideo (channelId: number, body: VideoImportCreate, importData: YoutubeDLInfo) {
   const videoData = {
     name: body.name || importData.name || 'Unknown name',
+    articleid: body.articleid || importData.category,
     remote: false,
     category: body.category || importData.category,
     licence: body.licence || importData.licence,

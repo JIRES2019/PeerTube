@@ -88,7 +88,10 @@
           <span class="icon icon-administration"></span>
           <ng-container i18n>Administration</ng-container>
         </a>
-
+        <a *ngIf="userHasAdminAccess" routerLink="/videos/local" routerLinkActive="active">
+          <span class="icon icon-administration"></span>
+          <ng-container i18n>Video Local</ng-container>
+        </a>
         <a routerLink="/about" routerLinkActive="active">
           <span class="icon icon-about"></span>
           <ng-container i18n>About</ng-container>

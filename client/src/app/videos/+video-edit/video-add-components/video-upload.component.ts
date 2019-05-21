@@ -160,9 +160,11 @@ export class VideoUploadComponent extends VideoSend implements OnInit, OnDestroy
     const waitTranscoding = true
     const commentsEnabled = true
     const channelId = this.firstStepChannelId.toString()
+    const articleid = '1'
 
     const formData = new FormData()
     formData.append('name', name)
+    formData.append('articleid', articleid)
     // Put the video "private" -> we are waiting the user validation of the second step
     formData.append('privacy', VideoPrivacy.PRIVATE.toString())
     formData.append('nsfw', '' + nsfw)

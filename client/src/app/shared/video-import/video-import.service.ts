@@ -67,9 +67,11 @@ export class VideoImportService {
     const description = video.description || null
     const support = video.support || null
     const scheduleUpdate = video.scheduleUpdate || null
+    const articleid = video.articleid || null
 
     return {
       name: video.name,
+      articleid,
       category,
       licence,
       language,
