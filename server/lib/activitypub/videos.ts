@@ -224,6 +224,7 @@ async function updateVideoFromAP (options: {
       options.video.set('uuid', videoData.uuid)
       options.video.set('url', videoData.url)
       options.video.set('category', videoData.category)
+      options.video.set('types', videoData.types)
       options.video.set('licence', videoData.licence)
       options.video.set('language', videoData.language)
       options.video.set('description', videoData.description)
@@ -422,6 +423,10 @@ async function videoActivityObjectToDBAttributes (
   if (videoObject.category) {
     category = parseInt(videoObject.category.identifier, 10)
   }
+  let types: number | undefined
+  if (videoObject.types) {
+    types = parseInt(videoObject.types.identifier, 10)
+  }
 
   let licence: number | undefined
   if (videoObject.licence) {
@@ -436,6 +441,7 @@ async function videoActivityObjectToDBAttributes (
     uuid: videoObject.uuid,
     url: videoObject.id,
     category,
+    types,
     licence,
     language,
     description,

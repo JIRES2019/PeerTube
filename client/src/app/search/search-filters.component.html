@@ -55,7 +55,15 @@
           </select>
         </div>
       </div>
-
+      <div class="form-group">
+        <label i18n for="types">Types</label>
+        <div class="peertube-select-container">
+          <select id="types" name="types" [(ngModel)]="advancedSearch.typesOneOf">
+            <option></option>
+            <option *ngFor="let types of videoTypes" [value]="types.id">{{ types.label }}</option>
+          </select>
+        </div>
+      </div>
       <div class="form-group">
         <label i18n for="licence">Licence</label>
         <div class="peertube-select-container">

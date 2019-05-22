@@ -66,6 +66,7 @@ function sanitizeAndCheckVideoTorrentObject (video: any) {
     isActivityPubVideoDurationValid(video.duration) &&
     isUUIDValid(video.uuid) &&
     (!video.category || isRemoteNumberIdentifierValid(video.category)) &&
+    (!video.types || isRemoteNumberIdentifierValid(video.types)) &&
     (!video.licence || isRemoteNumberIdentifierValid(video.licence)) &&
     (!video.language || isRemoteStringIdentifierValid(video.language)) &&
     isVideoViewsValid(video.views) &&

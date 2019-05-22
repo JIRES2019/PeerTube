@@ -35,6 +35,10 @@ function videoModelToFormattedJSON (video: VideoModel, options?: VideoFormatting
       id: video.category,
       label: VideoModel.getCategoryLabel(video.category)
     },
+    types: {
+      id: video.types,
+      label: VideoModel.getTypesLabel(video.types)
+    },
     licence: {
       id: video.licence,
       label: VideoModel.getLicenceLabel(video.licence)
@@ -202,7 +206,13 @@ function videoModelToActivityPubObject (video: VideoModel): VideoTorrentObject {
       name: VideoModel.getCategoryLabel(video.category)
     }
   }
-
+  let types
+  if (video.types) {
+    types = {
+      identifier: video.types + '',
+      name: VideoModel.getTypesLabel(video.types)
+    }
+  }
   let licence
   if (video.licence) {
     licence = {
@@ -265,6 +275,7 @@ function videoModelToActivityPubObject (video: VideoModel): VideoTorrentObject {
     tag,
     autor,
     category,
+    types,
     licence,
     language,
     views: video.views,

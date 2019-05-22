@@ -211,6 +211,7 @@ async function listVideoChannelVideos (req: express.Request, res: express.Respon
     sort: req.query.sort,
     includeLocalVideos: true,
     categoryOneOf: req.query.categoryOneOf,
+    typesOneOf: req.query.typesOneOf,
     licenceOneOf: req.query.licenceOneOf,
     languageOneOf: req.query.languageOneOf,
     tagsOneOf: req.query.tagsOneOf,

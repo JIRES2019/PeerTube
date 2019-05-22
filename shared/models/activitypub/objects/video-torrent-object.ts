@@ -17,6 +17,7 @@ export interface VideoTorrentObject {
   tag: ActivityTagObject[]
   autor: ActivityAutorObject[]
   category: ActivityIdentifierObject
+  types: ActivityIdentifierObject
   licence: ActivityIdentifierObject
   language: ActivityIdentifierObject
   subtitleLanguage: ActivityIdentifierObject[]

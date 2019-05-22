@@ -19,6 +19,7 @@ function activityPubContextify <T> (data: T) {
         Hashtag: 'as:Hashtag',
         uuid: 'sc:identifier',
         category: 'sc:category',
+        types: 'sc:types',
         licence: 'sc:license',
         subtitleLanguage: 'sc:subtitleLanguage',
         sensitive: 'as:sensitive',

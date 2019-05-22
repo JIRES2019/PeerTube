@@ -16,6 +16,7 @@ import {
   checkUserCanManageVideo,
   isScheduleVideoUpdatePrivacyValid,
   isVideoCategoryValid,
+  isVideoTypesValid,
   isVideoArticleidValid,
   isVideoChannelOfAccountExist,
   isVideoDescriptionValid,
@@ -315,6 +316,10 @@ function getCommonVideoAttributes () {
       .optional()
       .customSanitizer(toIntOrNull)
       .custom(isVideoCategoryValid).withMessage('Should have a valid category'),
+    body('types')
+      .optional()
+      .customSanitizer(toIntOrNull)
+      .custom(isVideoTypesValid).withMessage('Should have a valid types'),
     body('licence')
       .optional()
       .customSanitizer(toIntOrNull)
@@ -374,6 +379,10 @@ const commonVideosFiltersValidator = [
     .optional()
     .customSanitizer(toArray)
     .custom(isNumberArray).withMessage('Should have a valid one of category array'),
+  query('typesOneOf')
+    .optional()
+    .customSanitizer(toArray)
+    .custom(isNumberArray).withMessage('Should have a valid one of types array'),
   query('licenceOneOf')
     .optional()
     .customSanitizer(toArray)

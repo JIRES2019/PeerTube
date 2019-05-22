@@ -19,6 +19,7 @@ export class SearchFiltersComponent implements OnInit {
   @Output() filtered = new EventEmitter<AdvancedSearch>()
 
   videoCategories: VideoConstant<number>[] = []
+  videoTypes: VideoConstant<number>[] = []
   videoLicences: VideoConstant<number>[] = []
   videoLanguages: VideoConstant<string>[] = []
 
@@ -85,6 +86,7 @@ export class SearchFiltersComponent implements OnInit {
 
   ngOnInit () {
     this.videoCategories = this.serverService.getVideoCategories()
+    this.videoTypes = this.serverService.getVideoTypes()
     this.videoLicences = this.serverService.getVideoLicences()
     this.videoLanguages = this.serverService.getVideoLanguages()
 

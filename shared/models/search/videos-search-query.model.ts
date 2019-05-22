@@ -15,6 +15,8 @@ export interface VideosSearchQuery {
 
   categoryOneOf?: number[]
 
+  typesOneOf?: number[]
+
   licenceOneOf?: number[]
 
   languageOneOf?: string[]

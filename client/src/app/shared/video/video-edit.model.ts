@@ -8,6 +8,7 @@ export class VideoEdit implements VideoUpdate {
 
   category: number
   licence: number
+  types: number
   language: string
   description: string
   name: string
@@ -33,6 +34,7 @@ export class VideoEdit implements VideoUpdate {
       this.id = video.id
       this.uuid = video.uuid
       this.category = video.category.id
+      this.types = video.types.id
       this.licence = video.licence.id
       this.language = video.language.id
       this.description = video.description
@@ -76,6 +78,7 @@ export class VideoEdit implements VideoUpdate {
   toFormPatch () {
     const json = {
       category: this.category,
+      types: this.types,
       licence: this.licence,
       language: this.language,
       description: this.description,

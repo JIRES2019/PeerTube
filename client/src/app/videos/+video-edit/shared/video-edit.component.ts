@@ -34,6 +34,7 @@ export class VideoEditComponent implements OnInit, OnDestroy {
   readonly SPECIAL_SCHEDULED_PRIVACY = VideoEdit.SPECIAL_SCHEDULED_PRIVACY
 
   videoCategories: VideoConstant<number>[] = []
+  videoTypes: VideoConstant<number>[] = []
   videoLicences: VideoConstant<number>[] = []
   videoLanguages: VideoConstant<string>[] = []
 
@@ -97,6 +98,7 @@ export class VideoEditComponent implements OnInit, OnDestroy {
       commentsEnabled: null,
       waitTranscoding: null,
       category: this.videoValidatorsService.VIDEO_CATEGORY,
+      types: this.videoValidatorsService.VIDEO_TYPES,
       licence: this.videoValidatorsService.VIDEO_LICENCE,
       language: this.videoValidatorsService.VIDEO_LANGUAGE,
       description: this.videoValidatorsService.VIDEO_DESCRIPTION,
@@ -131,6 +133,7 @@ export class VideoEditComponent implements OnInit, OnDestroy {
     this.updateForm()
 
     this.videoCategories = this.serverService.getVideoCategories()
+    this.videoTypes = this.serverService.getVideoTypes()
     this.videoLicences = this.serverService.getVideoLicences()
     this.videoLanguages = this.serverService.getVideoLanguages()
 

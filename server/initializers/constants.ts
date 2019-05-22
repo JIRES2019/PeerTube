@@ -449,7 +449,16 @@ const VIDEO_LICENCES = {
   6: 'Attribution - Non Commercial - No Derivatives',
   7: 'Public Domain Dedication'
 }
-
+const VIDEO_TYPES = {
+  1: 'Présentation Longue',
+  2: 'Présentation Courte',
+  3: 'Session industriel',
+  4: 'Poster',
+  5: 'Stand des associations du libre',
+  6: 'Interview',
+  7: 'BOF',
+  8: 'Lightning talk'
+}
 const VIDEO_LANGUAGES = buildLanguages()
 
 const VIDEO_PRIVACIES = {
@@ -726,6 +735,7 @@ export {
   ACTIVITY_PUB_ACTOR_TYPES,
   THUMBNAILS_SIZE,
   VIDEO_CATEGORIES,
+  VIDEO_TYPES,
   VIDEO_LANGUAGES,
   VIDEO_PRIVACIES,
   VIDEO_LICENCES,

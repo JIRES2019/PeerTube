@@ -3,6 +3,7 @@ import { VideoScheduleUpdate } from './video-schedule-update.model'
 
 export interface VideoCreate {
   category?: number
+  types?: number
   licence?: number
   language?: string
   description?: string

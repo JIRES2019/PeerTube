@@ -8,6 +8,8 @@ export class AdvancedSearch {
 
   categoryOneOf: string
 
+  typesOneOf: string
+
   licenceOneOf: string
 
   languageOneOf: string
@@ -28,6 +30,7 @@ export class AdvancedSearch {
     endDate?: string
     nsfw?: NSFWQuery
     categoryOneOf?: string
+    typesOneOf?: string
     licenceOneOf?: string
     languageOneOf?: string
     tagsOneOf?: string
@@ -44,7 +47,7 @@ export class AdvancedSearch {
     this.endDate = options.endDate || undefined
     this.nsfw = options.nsfw || undefined
     this.categoryOneOf = options.categoryOneOf || undefined
-    this.licenceOneOf = options.licenceOneOf || undefined
+    this.typesOneOf = options.typesOneOf || undefined
     this.languageOneOf = options.languageOneOf || undefined
     this.tagsOneOf = options.tagsOneOf || undefined
     this.tagsAllOf = options.tagsAllOf || undefined
@@ -75,6 +78,7 @@ export class AdvancedSearch {
     this.endDate = undefined
     this.nsfw = undefined
     this.categoryOneOf = undefined
+    this.typesOneOf = undefined
     this.licenceOneOf = undefined
     this.languageOneOf = undefined
     this.tagsOneOf = undefined
@@ -93,6 +97,7 @@ export class AdvancedSearch {
       endDate: this.endDate,
       nsfw: this.nsfw,
       categoryOneOf: this.categoryOneOf,
+      typesOneOf: this.typesOneOf,
       licenceOneOf: this.licenceOneOf,
       languageOneOf: this.languageOneOf,
       tagsOneOf: this.tagsOneOf,
@@ -111,6 +116,7 @@ export class AdvancedSearch {
       endDate: this.endDate,
       nsfw: this.nsfw,
       categoryOneOf: this.intoArray(this.categoryOneOf),
+      typesOneOf: this.intoArray(this.typesOneOf),
       licenceOneOf: this.intoArray(this.licenceOneOf),
       languageOneOf: this.intoArray(this.languageOneOf),
       tagsOneOf: this.intoArray(this.tagsOneOf),

@@ -5,6 +5,7 @@ export interface VideoUpdate {
   name?: string
   articleid?: number
   category?: number
+  types?: number
   licence?: number
   language?: string
   description?: string

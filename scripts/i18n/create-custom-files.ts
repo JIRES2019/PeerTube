@@ -4,6 +4,7 @@ import { join } from 'path'
 import {
   buildLanguages,
   VIDEO_CATEGORIES,
+  VIDEO_TYPES,
   VIDEO_IMPORT_STATES,
   VIDEO_LICENCES,
   VIDEO_PRIVACIES,
@@ -38,6 +39,7 @@ const playerTranslations = {
 // Server keys
 const serverKeys: any = {}
 values(VIDEO_CATEGORIES)
+  .concat(values(VIDEO_TYPES))
   .concat(values(VIDEO_LICENCES))
   .concat(values(VIDEO_PRIVACIES))
   .concat(values(VIDEO_STATES))

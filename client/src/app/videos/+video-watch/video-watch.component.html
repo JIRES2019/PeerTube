@@ -168,7 +168,15 @@
               [routerLink]="[ '/search' ]" [queryParams]="{ categoryOneOf: [ video.category.id ] }"
             >{{ video.category.label }}</a>
           </div>
-
+         
+          <div class="video-attribute">
+            <span i18n class="video-attribute-label">Types</span>
+            <span *ngIf="!video.types.id" class="video-attribute-value">{{ video.types.label }}</span>
+            <a
+              *ngIf="video.types.id" class="video-attribute-value"
+              [routerLink]="[ '/search' ]" [queryParams]="{ typesOneOf: [ video.types.id ] }"
+            >{{ video.types.label }}</a>
+          </div>
           <div class="video-attribute">
             <span i18n class="video-attribute-label">Licence</span>
             <span *ngIf="!video.licence.id" class="video-attribute-value">{{ video.licence.label }}</span>

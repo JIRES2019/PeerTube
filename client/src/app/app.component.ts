@@ -84,6 +84,7 @@ export class AppComponent implements OnInit {
     // Load custom data from server
     this.serverService.loadConfig()
     this.serverService.loadVideoCategories()
+    this.serverService.loadVideoTypes()
     this.serverService.loadVideoLanguages()
     this.serverService.loadVideoLicences()
     this.serverService.loadVideoPrivacies()

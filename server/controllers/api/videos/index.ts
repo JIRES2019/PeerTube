@@ -13,6 +13,7 @@ import {
   sequelizeTypescript,
   THUMBNAILS_SIZE,
   VIDEO_CATEGORIES,
+  VIDEO_TYPES,
   VIDEO_LANGUAGES,
   VIDEO_LICENCES,
   VIDEO_MIMETYPE_EXT,
@@ -91,6 +92,7 @@ videosRouter.use('/', ownershipVideoRouter)
 videosRouter.use('/', watchingRouter)
 
 videosRouter.get('/categories', listVideoCategories)
+videosRouter.get('/types', listVideoTypes)
 videosRouter.get('/licences', listVideoLicences)
 videosRouter.get('/languages', listVideoLanguages)
 videosRouter.get('/privacies', listVideoPrivacies)
@@ -148,7 +150,9 @@ export {
 function listVideoCategories (req: express.Request, res: express.Response) {
   res.json(VIDEO_CATEGORIES)
 }
-
+function listVideoTypes (req: express.Request, res: express.Response) {
+  res.json(VIDEO_TYPES)
+}
 function listVideoLicences (req: express.Request, res: express.Response) {
   res.json(VIDEO_LICENCES)
 }
@@ -178,6 +182,7 @@ async function addVideo (req: express.Request, res: express.Response) {
     articleid: videoInfo.articleid,
     remote: false,
     category: videoInfo.category,
+    types: videoInfo.types,
     licence: videoInfo.licence,
     language: videoInfo.language,
     commentsEnabled: videoInfo.commentsEnabled || false,
@@ -324,6 +329,7 @@ async function updateVideo (req: express.Request, res: express.Response) {
       if (videoInfoToUpdate.name !== undefined) videoInstance.set('name', videoInfoToUpdate.name)
       if (videoInfoToUpdate.articleid !== undefined) videoInstance.set('articleid', videoInfoToUpdate.articleid)
       if (videoInfoToUpdate.category !== undefined) videoInstance.set('category', videoInfoToUpdate.category)
+      if (videoInfoToUpdate.types !== undefined) videoInstance.set('types', videoInfoToUpdate.types)
       if (videoInfoToUpdate.licence !== undefined) videoInstance.set('licence', videoInfoToUpdate.licence)
       if (videoInfoToUpdate.language !== undefined) videoInstance.set('language', videoInfoToUpdate.language)
       if (videoInfoToUpdate.nsfw !== undefined) videoInstance.set('nsfw', videoInfoToUpdate.nsfw)
@@ -445,6 +451,7 @@ async function listVideos (req: express.Request, res: express.Response, next: ex
     sort: req.query.sort,
     includeLocalVideos: true,
     categoryOneOf: req.query.categoryOneOf,
+    typesOneOf: req.query.typesOneOf,
     licenceOneOf: req.query.licenceOneOf,
     languageOneOf: req.query.languageOneOf,
     tagsOneOf: req.query.tagsOneOf,

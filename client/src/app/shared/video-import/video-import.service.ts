@@ -64,6 +64,7 @@ export class VideoImportService {
     const language = video.language || null
     const licence = video.licence || null
     const category = video.category || null
+    const types = video.types || null
     const description = video.description || null
     const support = video.support || null
     const scheduleUpdate = video.scheduleUpdate || null
@@ -73,6 +74,7 @@ export class VideoImportService {
       name: video.name,
       articleid,
       category,
+      types,
       licence,
       language,
       support,

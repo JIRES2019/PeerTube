@@ -36,6 +36,7 @@ import { isActivityPubUrlValid } from '../../helpers/custom-validators/activityp
 import { isArray, isBooleanValid } from '../../helpers/custom-validators/misc'
 import {
   isVideoCategoryValid,
+  isVideoTypesValid,
   isVideoDescriptionValid,
   isVideoDurationValid,
   isVideoLanguageValid,
@@ -60,6 +61,7 @@ import {
   STATIC_PATHS,
   THUMBNAILS_SIZE,
   VIDEO_CATEGORIES,
+  VIDEO_TYPES,
   VIDEO_LANGUAGES,
   VIDEO_LICENCES,
   VIDEO_PRIVACIES,
@@ -106,6 +108,7 @@ const indexes: Sequelize.DefineIndexesOptions[] = [
   { fields: [ 'publishedAt' ] },
   { fields: [ 'duration' ] },
   { fields: [ 'category' ] },
+  { fields: [ 'types' ] },
   { fields: [ 'licence' ] },
   { fields: [ 'articleid' ] },
   { fields: [ 'nsfw' ] },
@@ -149,6 +152,7 @@ type AvailableForListIDsOptions = {
   includeLocalVideos: boolean
   filter?: VideoFilter
   categoryOneOf?: number[]
+  typesOneOf?: number[]
   nsfw?: boolean
   licenceOneOf?: number[]
   languageOneOf?: string[]
@@ -435,6 +439,11 @@ type AvailableForListIDsOptions = {
         [ Sequelize.Op.or ]: options.categoryOneOf
       }
     }
+    if (options.typesOneOf) {
+      query.where[ 'types' ] = {
+        [ Sequelize.Op.or ]: options.typesOneOf
+      }
+    }
 
     if (options.licenceOneOf) {
       query.where[ 'licence' ] = {
@@ -586,6 +595,13 @@ export class VideoModel extends Model<VideoModel> {
   @Is('VideoCategory', value => throwIfNotValid(value, isVideoCategoryValid, 'category'))
   @Column
   category: number
+
+
+  @AllowNull(true)
+  @Default(null)
+  @Is('VideoTypes', value => throwIfNotValid(value, isVideoTypesValid, 'types'))
+  @Column
+  types: number
 
     @AllowNull(true)
   @Default(null)
@@ -1033,6 +1049,7 @@ export class VideoModel extends Model<VideoModel> {
     includeLocalVideos: boolean,
     withFiles: boolean,
     categoryOneOf?: number[],
+    typesOneOf?: number[],
     licenceOneOf?: number[],
     languageOneOf?: string[],
     tagsOneOf?: string[],
@@ -1073,6 +1090,7 @@ export class VideoModel extends Model<VideoModel> {
       serverAccountId: serverActor.Account.id,
       nsfw: options.nsfw,
       categoryOneOf: options.categoryOneOf,
+      typesOneOf: options.typesOneOf,
       licenceOneOf: options.licenceOneOf,
       languageOneOf: options.languageOneOf,
       tagsOneOf: options.tagsOneOf,
@@ -1101,6 +1119,7 @@ export class VideoModel extends Model<VideoModel> {
     endDate?: string // ISO 8601
     nsfw?: boolean
     categoryOneOf?: number[]
+    typesOneOf?: number[]
     licenceOneOf?: number[]
     languageOneOf?: string[]
     tagsOneOf?: string[]
@@ -1188,6 +1207,7 @@ export class VideoModel extends Model<VideoModel> {
       includeLocalVideos: options.includeLocalVideos,
       nsfw: options.nsfw,
       categoryOneOf: options.categoryOneOf,
+      typesOneOf: options.typesOneOf,
       licenceOneOf: options.licenceOneOf,
       languageOneOf: options.languageOneOf,
       tagsOneOf: options.tagsOneOf,
@@ -1430,6 +1450,9 @@ export class VideoModel extends Model<VideoModel> {
 
   static getCategoryLabel (id: number) {
     return VIDEO_CATEGORIES[ id ] || 'Misc'
+  }
+  static getTypesLabel (id: number) {
+    return VIDEO_TYPES[ id ] || 'Misc'
   }
 
   static getLicenceLabel (id: number) {

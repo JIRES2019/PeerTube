@@ -7,6 +7,7 @@ import { UserRight, VideoFilter, VideoPrivacy, VideoRateType } from '../../../sh
 import {
   CONSTRAINTS_FIELDS,
   VIDEO_CATEGORIES,
+  VIDEO_TYPES,
   VIDEO_LICENCES,
   VIDEO_MIMETYPE_EXT,
   VIDEO_PRIVACIES,
@@ -29,7 +30,9 @@ function isVideoFilterValid (filter: VideoFilter) {
 function isVideoCategoryValid (value: any) {
   return value === null || VIDEO_CATEGORIES[ value ] !== undefined
 }
-
+function isVideoTypesValid (value: any) {
+  return value === null || VIDEO_TYPES[ value ] !== undefined
+}
 function isVideoStateValid (value: any) {
   return exists(value) && VIDEO_STATES[ value ] !== undefined
 }
@@ -216,6 +219,7 @@ async function isVideoChannelOfAccountExist (channelId: number, user: UserModel,
 
 export {
   isVideoCategoryValid,
+  isVideoTypesValid,
   checkUserCanManageVideo,
   isVideoLicenceValid,
   isVideoLanguageValid,

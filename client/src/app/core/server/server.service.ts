@@ -21,6 +21,7 @@ export class ServerService {
   configLoaded = new ReplaySubject<boolean>(1)
   videoPrivaciesLoaded = new ReplaySubject<boolean>(1)
   videoCategoriesLoaded = new ReplaySubject<boolean>(1)
+  videoTypesLoaded = new ReplaySubject<boolean>(1)
   videoLicencesLoaded = new ReplaySubject<boolean>(1)
   videoLanguagesLoaded = new ReplaySubject<boolean>(1)
   localeObservable: Observable<any>
@@ -83,6 +84,7 @@ export class ServerService {
     }
   }
   private videoCategories: Array<VideoConstant<number>> = []
+  private videoTypes: Array<VideoConstant<number>> = []
   private videoLicences: Array<VideoConstant<number>> = []
   private videoLanguages: Array<VideoConstant<string>> = []
   private videoPrivacies: Array<VideoConstant<VideoPrivacy>> = []
@@ -108,7 +110,9 @@ export class ServerService {
   loadVideoCategories () {
     return this.loadVideoAttributeEnum('categories', this.videoCategories, this.videoCategoriesLoaded, true)
   }
-
+  loadVideoTypes () {
+    return this.loadVideoAttributeEnum('types', this.videoTypes, this.videoTypesLoaded, true)
+  }
   loadVideoLicences () {
     return this.loadVideoAttributeEnum('licences', this.videoLicences, this.videoLicencesLoaded)
   }
@@ -128,7 +132,9 @@ export class ServerService {
   getVideoCategories () {
     return this.videoCategories
   }
-
+  getVideoTypes () {
+    return this.videoTypes
+  }
   getVideoLicences () {
     return this.videoLicences
   }
@@ -146,7 +152,7 @@ export class ServerService {
   }
 
   private loadVideoAttributeEnum (
-    attributeName: 'categories' | 'licences' | 'languages' | 'privacies',
+    attributeName: 'categories' | 'types' | 'licences' | 'languages' | 'privacies',
     hashToPopulate: VideoConstant<string | number>[],
     notifier: ReplaySubject<boolean>,
     sort = false

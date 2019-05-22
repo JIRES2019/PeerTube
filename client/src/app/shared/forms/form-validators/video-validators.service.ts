@@ -9,6 +9,7 @@ export class VideoValidatorsService {
   readonly VIDEO_ARTICLEID: BuildFormValidator
   readonly VIDEO_PRIVACY: BuildFormValidator
   readonly VIDEO_CATEGORY: BuildFormValidator
+  readonly VIDEO_TYPES: BuildFormValidator
   readonly VIDEO_LICENCE: BuildFormValidator
   readonly VIDEO_LANGUAGE: BuildFormValidator
   readonly VIDEO_IMAGE: BuildFormValidator
@@ -46,7 +47,10 @@ export class VideoValidatorsService {
       VALIDATORS: [ ],
       MESSAGES: {}
     }
-
+    this.VIDEO_TYPES = {
+      VALIDATORS: [ ],
+      MESSAGES: {}
+    }
     this.VIDEO_LICENCE = {
       VALIDATORS: [ ],
       MESSAGES: {}

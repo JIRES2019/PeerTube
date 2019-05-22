@@ -18,6 +18,7 @@ export class Video implements VideoServerModel {
   updatedAt: Date
   publishedAt: Date
   category: VideoConstant<number>
+  types: VideoConstant<number>
   licence: VideoConstant<number>
   language: VideoConstant<string>
   privacy: VideoConstant<VideoPrivacy>
@@ -81,6 +82,7 @@ export class Video implements VideoServerModel {
     this.createdAt = new Date(hash.createdAt.toString())
     this.publishedAt = new Date(hash.publishedAt.toString())
     this.category = hash.category
+    this.types = hash.types
     this.licence = hash.licence
     this.language = hash.language
     this.privacy = hash.privacy
@@ -113,6 +115,7 @@ export class Video implements VideoServerModel {
     this.videoChannelAvatarUrl = Actor.GET_ACTOR_AVATAR_URL(this.channel)
 
     this.category.label = peertubeTranslate(this.category.label, translations)
+    this.types.label = peertubeTranslate(this.types.label, translations)
     this.licence.label = peertubeTranslate(this.licence.label, translations)
     this.language.label = peertubeTranslate(this.language.label, translations)
     this.privacy.label = peertubeTranslate(this.privacy.label, translations)

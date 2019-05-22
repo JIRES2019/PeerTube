@@ -44,6 +44,7 @@ export interface Video {
   updatedAt: Date | string
   publishedAt: Date | string
   category: VideoConstant<number>
+  types: VideoConstant<number>
   licence: VideoConstant<number>
   language: VideoConstant<string>
   privacy: VideoConstant<VideoPrivacy>

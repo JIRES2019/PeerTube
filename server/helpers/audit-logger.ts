@@ -99,6 +99,7 @@ const videoKeysToKeep = [
   'updatedAt',
   'publishedAt',
   'category',
+  'types',
   'licence',
   'language',
   'privacy',
