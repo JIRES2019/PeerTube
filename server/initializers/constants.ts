@@ -437,6 +437,7 @@ const VIDEO_CATEGORIES = {
   17: 'Prospective',
   18: 'Réseau',
   19: 'Divers'
+  20: 'Organisation'
 }
 
 // See https://creativecommons.org/licenses/?lang=en
@@ -452,12 +453,13 @@ const VIDEO_LICENCES = {
 const VIDEO_TYPES = {
   1: 'Présentation Longue',
   2: 'Présentation Courte',
-  3: 'Session industriel',
+  3: 'Session industrielle',
   4: 'Poster',
   5: 'Stand des associations du libre',
   6: 'Interview',
   7: 'BOF',
   8: 'Lightning talk'
+  9: 'Table ronde'
 }
 const VIDEO_LANGUAGES = buildLanguages()
 

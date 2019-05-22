@@ -160,7 +160,7 @@ export class VideoUploadComponent extends VideoSend implements OnInit, OnDestroy
     const waitTranscoding = true
     const commentsEnabled = true
     const channelId = this.firstStepChannelId.toString()
-    const articleid = '1'
+    const articleid = '0'
 
     const formData = new FormData()
     formData.append('name', name)
@@ -178,6 +178,7 @@ export class VideoUploadComponent extends VideoSend implements OnInit, OnDestroy
 
     this.form.patchValue({
       name,
+      articleid,
       privacy,
       nsfw,
       channelId

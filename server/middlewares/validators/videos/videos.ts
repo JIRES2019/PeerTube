@@ -56,7 +56,7 @@ const videosAddValidator = getCommonVideoAttributes().concat([
       + CONSTRAINTS_FIELDS.VIDEOS.EXTNAME.join(', ')
     ),
   body('name').custom(isVideoNameValid).withMessage('Should have a valid name'),
-  body('articleid'),
+  body('articleid').custom(isVideoArticleidValid).withMessage('Should have an articleid'),
   body('channelId')
     .toInt()
     .custom(isIdValid).withMessage('Should have correct video channel id'),

@@ -603,7 +603,7 @@ export class VideoModel extends Model<VideoModel> {
   @Column
   types: number
 
-    @AllowNull(true)
+  @AllowNull(true)
   @Default(null)
   @Is('VideoLicence', value => throwIfNotValid(value, isVideoLicenceValid, 'licence'))
   @Column
@@ -663,7 +663,8 @@ export class VideoModel extends Model<VideoModel> {
   @Column
   dislikes: number
 
-  @AllowNull(true)
+  @AllowNull(false)
+  @Default(0)
   @Is('VideoArticle', value => throwIfNotValid(value, isVideoArticleidValid, 'articleid'))
   @Column
   articleid: number
