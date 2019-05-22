@@ -436,7 +436,7 @@ const VIDEO_CATEGORIES = {
   16: 'Plateformes scientifiques',
   17: 'Prospective',
   18: 'Réseau',
-  19: 'Divers'
+  19: 'Divers',
   20: 'Organisation'
 }
 
@@ -458,7 +458,7 @@ const VIDEO_TYPES = {
   5: 'Stand des associations du libre',
   6: 'Interview',
   7: 'BOF',
-  8: 'Lightning talk'
+  8: 'Lightning talk',
   9: 'Table ronde'
 }
 const VIDEO_LANGUAGES = buildLanguages()
