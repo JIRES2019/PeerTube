@@ -437,7 +437,12 @@ const VIDEO_CATEGORIES = {
   17: 'Prospective',
   18: 'Réseau',
   19: 'Divers',
-  20: 'Organisation'
+  20: 'Organisation',
+  21: 'Type Plénière',
+  22: 'Usages et applications',
+  23: 'Stratégie numérique des établissements et des laboratoires',
+  24: 'Devops et agilité',
+  25: 'Système'
 }
 
 // See https://creativecommons.org/licenses/?lang=en
